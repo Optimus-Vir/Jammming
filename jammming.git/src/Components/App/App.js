@@ -9,60 +9,9 @@ class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-                  searchResults: [
-                                  {
-                                    name: "Rusalka, Rusalka / Wild Rushes",
-                                    artist: "The Decemberists",
-                                    album: "I'll Be Your Girl",
-                                    id: 1
-                                  },
-                                  {
-                                    name: "Rivendell",
-                                    artist: "Rush",
-                                    album: "Fly By Night",
-                                    id: 2
-                                  },
-                                  {
-                                    name: "Settled Down",
-                                    artist: "Mandolin Orange",
-                                    album: "Such Jubilee",
-                                    id: 3
-                                  },
-                                  {
-                                    name: "Landslide",
-                                    artist: "Fleetwood Mac",
-                                    album: "Fleetwood Mac",
-                                    id: 4
-                                  }
-                                ],
+                  searchResults: [],
                   playlistName: "Songs",
-                  playlistTracks: [
-                                  {
-                                    name: "Rusalka, Rusalka / Wild Rushes",
-                                    artist: "The Decemberists",
-                                    album: "I'll Be Your Girl",
-                                    id: 1
-                                  },
-                                  {
-                                    name: "Rivendell",
-                                    artist: "Rush",
-                                    album: "Fly By Night",
-                                    id: 2
-                                  },
-                                  {
-                                    name: "Settled Down",
-                                    artist: "Mandolin Orange",
-                                    album: "Such Jubilee",
-                                    id: 3
-                                  },
-                                  {
-                                    name: "Landslide",
-                                    artist: "Fleetwood Mac",
-                                    album: "Fleetwood Mac",
-                                    id: 4
-                                  }
-                                ]
-
+                  playlistTracks: []
                 }
     this.addTrack = this.addTrack.bind(this)
     this.removeTrack = this.removeTrack.bind(this)
@@ -72,7 +21,7 @@ class App extends React.Component {
   }
 
   addTrack(track) {
-  if (this.state.playlistTracks.findIndex(trackX => trackX.id === track.id) === -1) {
+  if (this.state.playlistTracks.findIndex(_track => _track.id === track.id) === -1) {
       let playlistTracks = this.state.playlistTracks
       playlistTracks.push(track)
       this.setState({playlistTracks: playlistTracks})
@@ -94,21 +43,21 @@ class App extends React.Component {
   }
 
   savePlaylist() {
-    let trackURIs = [];
-    this.state.playlistTracks.map(_track => {
-      trackURIs.push(_track.uri)
+    const trackURIs = this.state.playlistTracks.map(track => track.uri);
+    Spotify.savePlaylist(this.state.playlistName, trackURIs).then(() => {
+      this.setState({
+        playlistName: 'New Playlist',
+        playlistTracks: []
+      });
     });
-    return trackURIs
   }
 
   search(searchTerm) {
-    Spotify.search(searchTerm)
-    this.setState({searchResults: Spotify.search(searchTerm).then(tracks => {
-          this.setState({
-            searchResults: tracks
-          })
-        })
-      })
+    Spotify.search(searchTerm).then(spotifySearchResults => {
+      this.setState({
+                    searchResults: spotifySearchResults
+                  })
+    })
   }
 
   render() {
